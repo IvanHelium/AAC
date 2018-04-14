@@ -38,29 +38,41 @@ MainWindow::MainWindow(QWidget *parent) :
     n01.append_out_neurons(ptr_n01);
     n01.append_out_neurons(n04);*/
 
-    std::shared_ptr<neuron_AAC_type_1> n01(new neuron_AAC_type_1("n01", 3, 3, 0.9, 0.9));
+    /*std::shared_ptr<neuron_AAC_type_1> n01(new neuron_AAC_type_1("n01", 3, 3, 0.9, 0.9));
 
     std::shared_ptr<neuron_AAC_type_1> n02(new neuron_AAC_type_1("n02", 3, 3, 0.9, 0.9));
 
-    std::shared_ptr<neuron_AAC_type_1> n03(new neuron_AAC_type_1("n03", 3, 3, 0.9, 0.9));
+    std::shared_ptr<neuron_AAC_type_1> n03(new neuron_AAC_type_1("n03", 3, 3, 0.9, 0.9));*/
 
 
-    n01->append_out_neurons(n02);
-    n02->append_in_neurons(n01);
-    n01->append_out_neurons(n03);
-    n03->append_in_neurons(n01);
+    for(int i = 0; i< 11; i++)
+    {
+        net1.append(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("n"+std::to_string(i), 3, 3, 0.9, 0.9)));
+    }
 
 
-    std::vector <int> FIRST_IMAGE;
 
-    FIRST_IMAGE.push_back(1);
-    FIRST_IMAGE.push_back(1);
-    FIRST_IMAGE.push_back(1);
-    FIRST_IMAGE.push_back(1);
-    FIRST_IMAGE.push_back(1);
+    net1.at(0)->append_out_neurons(net1.at(5));
+  //  net1.at(5)->append_in_neurons(net1.at(0));
 
 
-for(int i = 0; i < 10; i++)
+
+    //n01->append_out_neurons(n02);
+    //n02->append_in_neurons(n01);
+    //n01->append_out_neurons(n03);
+    //n03->append_in_neurons(n01);
+
+
+    //std::vector <int> FIRST_IMAGE;
+
+    //FIRST_IMAGE.push_back(1);
+    //FIRST_IMAGE.push_back(1);
+    //FIRST_IMAGE.push_back(1);
+    //FIRST_IMAGE.push_back(1);
+    //FIRST_IMAGE.push_back(1);
+
+
+/*for(int i = 0; i < 11; i++)
 {
 
     n01->run(FIRST_IMAGE);
@@ -69,7 +81,7 @@ for(int i = 0; i < 10; i++)
     n02->sync();
     n03->run();
     n03->sync();
-}
+}*/
 
 
 
@@ -111,7 +123,8 @@ void MainWindow::timer_update()
     portNamesModel.setStringList(portNames);
     ui->comboBox->setCurrentText(currentPort);
 
-    serial->sendDriveForward();
+    //serial->sendDriveForward();
+    serial->sendDriveBackRight();
 }
 
 

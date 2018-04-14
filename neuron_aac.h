@@ -11,8 +11,8 @@ class neuron_AAC_type_1
 public:
     neuron_AAC_type_1();
     neuron_AAC_type_1(std::string id, int porog_g, int porog_l, float p_min, float p_max);
-    void append_out_neurons(std::shared_ptr<neuron_AAC_type_1>& neuron);
-    void append_in_neurons(std::shared_ptr<neuron_AAC_type_1>& neuron);
+    void append_out_neurons(const std::shared_ptr<neuron_AAC_type_1>& neuron);
+    void append_in_neurons(const std::shared_ptr<neuron_AAC_type_1>& neuron);
     double porog();
     int block_R();
     int block_L();
@@ -47,6 +47,8 @@ private:
     std::vector<std::shared_ptr<neuron_AAC_type_1>> out_neurons;
     int size_out;
     std::string TYPE;
+
+    std::string LEVEL;
 
 
 };

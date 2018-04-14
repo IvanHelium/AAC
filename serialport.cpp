@@ -4,6 +4,10 @@
 
 #define FIXED_HEADER 0xC4
 
+
+uint8_t serialDataState = 0;
+uint8_t serialDataOldState = 0;
+
 SerialPort::SerialPort(QObject *parent) :
     QObject(parent),
     serial(this)
@@ -65,20 +69,70 @@ void SerialPort::serialReceived()
 
 
 
-    if(serial.bytesAvailable() >= 8)
+    if(serial.bytesAvailable() > 0)
     {
-    Recieved_data = serial.readAll();
-        for(int i = 0; i < 8; i++)
+        Recieved_data.clear();
+        Recieved_data = serial.readAll();
+
+        for(int i = 0; i < Recieved_data.size(); i++)
         {
-            if(Recieved_data[i]==FIXED_HEADER )
+            if(serialDataOldState == 7 && serialDataState == 0)
             {
+                serialDataOldState=0;
 
+                break;
             }
-        }
+            switch(serialDataState)
+            {
+                case 0:
+                    if(Recieved_data[i] == FIXED_HEADER)
+                    {
+                        rec_data.clear();
+                        rec_data.append(Recieved_data[i]);
+                        serialDataState = 1;
+                    }
+                break;
+                case 1:
+                        rec_data.append(Recieved_data[i]);
+                        serialDataState = 2;
+                break;
+                case 2:
+                        rec_data.append(Recieved_data[i]);
+                        serialDataState = 3;
+                break;
+                case 3:
+                        rec_data.append(Recieved_data[i]);
+                        serialDataState = 4;
+                break;
+                case 4:
+                        rec_data.append(Recieved_data[i]);
+                        serialDataState = 5;
+                break;
+                case 5:
+                        rec_data.append(Recieved_data[i]);
+                        serialDataState = 6;
+                break;
+                case 6:
+                        rec_data.append(Recieved_data[i]);
+                        serialDataState = 7;
+                break;
+                case 7:
+                        rec_data.append(Recieved_data[i]);
+                        serialDataState = 0;
+                        serialDataOldState = 7;
+                break;
 
+           }
+        }
     }
-    readSensorData(Recieved_data);
-    emit hexReceived(Recieved_data.toHex());
+
+
+    readSensorData(rec_data);
+    rec_data.clear();
+    Recieved_data.clear();
+
+
+    emit hexReceived(rec_data.toHex());
     //processData(Recieved_data);
     //qDebug() << Recieved_data.toHex();
 }
@@ -129,7 +183,7 @@ uint8_t SerialPort::myCrc(QByteArray Recieved_data)
 {
     uint8_t crc= 0x00;
     crc = Recieved_data[0];
-    for(int i = 1; i < Recieved_data.size(); i++)
+    for(int i = 1; i < Recieved_data.size()-1; i++)
     {
         crc = crc ^ Recieved_data[i];
     }
@@ -164,7 +218,7 @@ void SerialPort::sendDriveForward()
 //---------------------------------------------------------------------------------------------------
 void SerialPort::sendDriveForwardLeft()
 {
-
+    serialSend(0xCE, 0xAF, 0x01, 0x14);
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -172,21 +226,21 @@ void SerialPort::sendDriveForwardLeft()
 //---------------------------------------------------------------------------------------------------
 void SerialPort::sendDriveForwardRight()
 {
-
+    serialSend(0xCE, 0xAF, 0x00, 0x14);
 }
 //---------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------
 void SerialPort::sendDriveBack()
 {
-
+    serialSend(0x7E, 0x00, 0x00, 0x14);
 }
 //---------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------
 void SerialPort::sendDriveBackLeft()
 {
-
+    serialSend(0x4E, 0xAF, 0x00, 0x14);
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -194,7 +248,7 @@ void SerialPort::sendDriveBackLeft()
 //---------------------------------------------------------------------------------------------------
 void SerialPort::sendDriveBackRight()
 {
-
+    serialSend(0x4E, 0xAF, 0x01, 0x14);
 }
 
 //---------------------------------------------------------------------------------------------------

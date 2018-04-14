@@ -32,9 +32,10 @@ private:
 
 
     //neuron net
-    std::shared_ptr<neuron_AAC_type_1> n01;
-    std::shared_ptr<neuron_AAC_type_1> n02;
-    std::shared_ptr<neuron_AAC_type_1> n03;
+    QList<std::shared_ptr<neuron_AAC_type_1>> net1;
+    //std::shared_ptr<neuron_AAC_type_1> n01;
+    //std::shared_ptr<neuron_AAC_type_1> n02;
+    //std::shared_ptr<neuron_AAC_type_1> n03;
 };
 
 #endif // MAINWINDOW_H
