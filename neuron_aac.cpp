@@ -28,6 +28,9 @@ neuron_AAC_type_1::neuron_AAC_type_1()
     size_out = 0;
     TYPE = "neuron_type_1";
     LEVEL = "";
+
+    drawX = 0;
+    drawY = 0;
 }
 neuron_AAC_type_1::neuron_AAC_type_1(std::string id, int porog_g, int porog_l, float p_min, float p_max)
 {
@@ -57,7 +60,8 @@ neuron_AAC_type_1::neuron_AAC_type_1(std::string id, int porog_g, int porog_l, f
 
     LEVEL = "";
 
-
+    drawX = 0;
+    drawY = 0;
 
 }
 
@@ -188,7 +192,34 @@ void neuron_AAC_type_1::reset()
 
 }
 
+void neuron_AAC_type_1::setDrawX(int drawx)
+{
+    drawX = drawx;
+}
 
+void neuron_AAC_type_1::setDrawY(int drawy)
+{
+    drawY = drawy;
+}
+
+int neuron_AAC_type_1::getDrawX()
+{
+    return drawX;
+}
+int neuron_AAC_type_1::getDrawY()
+{
+    return drawY;
+}
+
+std::vector<std::shared_ptr<neuron_AAC_type_1>> neuron_AAC_type_1::get_in_neurons()
+{
+    return in_neurons;
+}
+
+std::vector<std::shared_ptr<neuron_AAC_type_1>> neuron_AAC_type_1::get_out_neurons()
+{
+    return out_neurons;
+}
 //---------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------

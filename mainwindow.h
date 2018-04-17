@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include <QtSerialPort/QSerialPort>
 #include <QStringListModel>
+#include <QLabel>
 #include "neuron_aac.h"
 #include "serialport.h"
 
@@ -25,6 +26,8 @@ private slots:
     void timer_update();
     void debugSensorView(uint8_t tact_sensor_data,uint8_t direction_to_resource,uint8_t direction_to_resource_sign, uint8_t distance_to_recource);
 
+    void drawNetOnLabel(QList<std::shared_ptr<neuron_AAC_type_1>> net);
+
 private:
     Ui::MainWindow *ui;
     SerialPort *serial;
@@ -33,9 +36,8 @@ private:
 
     //neuron net
     QList<std::shared_ptr<neuron_AAC_type_1>> net1;
-    //std::shared_ptr<neuron_AAC_type_1> n01;
-    //std::shared_ptr<neuron_AAC_type_1> n02;
-    //std::shared_ptr<neuron_AAC_type_1> n03;
+    QPixmap pix;
+
 };
 
 #endif // MAINWINDOW_H

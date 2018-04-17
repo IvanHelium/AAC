@@ -13,6 +13,8 @@ public:
     neuron_AAC_type_1(std::string id, int porog_g, int porog_l, float p_min, float p_max);
     void append_out_neurons(const std::shared_ptr<neuron_AAC_type_1>& neuron);
     void append_in_neurons(const std::shared_ptr<neuron_AAC_type_1>& neuron);
+    std::vector<std::shared_ptr<neuron_AAC_type_1>> get_in_neurons();
+    std::vector<std::shared_ptr<neuron_AAC_type_1>> get_out_neurons();
     double porog();
     int block_R();
     int block_L();
@@ -22,6 +24,10 @@ public:
     void run();
     void sync();
     void reset();
+    void setDrawX(int drawx);
+    void setDrawY(int drawy);
+    int getDrawX();
+    int getDrawY();
 
 private:
     std::string ID;
@@ -49,6 +55,9 @@ private:
     std::string TYPE;
 
     std::string LEVEL;
+
+    int drawX;
+    int drawY;
 
 
 };
