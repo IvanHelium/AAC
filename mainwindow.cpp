@@ -13,12 +13,15 @@
 #include <QtGui>
 #include <QPoint>
 
+
 bool connect_check=false;
+QString netFileName = "netfile.txt";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     serial(new SerialPort(this))
+
 {
     ui->setupUi(this);
 
@@ -54,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     for(int i = 0; i< 11; i++)
     {
-        net1.append(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("n"+std::to_string(i), 3, 3, 0.9, 0.9)));
+        net1.append(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("n"+QString::number(i), 3, 3, 0.9, 0.9)));
     }
 
     int stepX = 50;
@@ -124,13 +127,55 @@ MainWindow::MainWindow(QWidget *parent) :
     net1.at(10)->append_in_neurons(net1.at(9));
 
 
+    //here find level of neurons
 
-    drawNetOnLabel(net1);
+    //defineStructure(net1);
 
-    //n01->append_out_neurons(n02);
-    //n02->append_in_neurons(n01);
-    //n01->append_out_neurons(n03);
-    //n03->append_in_neurons(n01);
+    //drawNetOnLabel(net1);
+
+
+    for(int i = 0; i < 9; i++)
+    {
+      net2.append(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("n"+QString::number(i), 3, 3, 0.9, 0.9)));
+    }
+
+    net2.at(0)->setDrawX(stepX);
+    net2.at(0)->setDrawY(stepY);
+    net2.at(3)->setDrawX(stepX);
+    net2.at(3)->setDrawY(2*stepY);
+    net2.at(6)->setDrawX(stepX);
+    net2.at(6)->setDrawY(3*stepY);
+    net2.at(8)->setDrawX(stepX);
+    net2.at(8)->setDrawY(4*stepY);
+
+    net2.at(1)->setDrawX(2*stepX);
+    net2.at(1)->setDrawY(stepY + stepY/2);
+    net2.at(4)->setDrawX(2*stepX);
+    net2.at(4)->setDrawY(2*stepY + stepY/2);
+    net2.at(7)->setDrawX(2*stepX);
+    net2.at(7)->setDrawY(3*stepY + stepY/2);
+
+    net2.at(2)->setDrawX(3*stepX);
+    net2.at(2)->setDrawY(stepY);
+    net2.at(5)->setDrawX(3*stepX);
+    net2.at(5)->setDrawY(2*stepY);
+
+
+    link(net2, 0, 1);
+    link(net2, 1, 2);
+    link(net2, 3, 1);
+    link(net2, 4, 2);
+    link(net2, 3, 4);
+    link(net2, 4, 5);
+    link(net2, 6, 4);
+    link(net2, 7, 5);
+    link(net2, 6, 7);
+    link(net2, 8, 7);
+
+    defineStructure(net2);
+
+    drawNetOnLabel(net2);
+
 
 
     //std::vector <int> FIRST_IMAGE;
@@ -154,9 +199,33 @@ MainWindow::MainWindow(QWidget *parent) :
 }*/
 
 
+matrixEvent *ME = new matrixEvent(4);
 
+ME->pad();
 
+ME->reset();
 
+ME->update({ 1, 1, 0, 0, 1});
+ME->update({ 1, 1, 0, 0, 1});
+ME->update({ 1, 1, 0, 0, 1});
+ME->update({ 1, 1, 0, 0, 1});
+ME->update({ 0, 0, 1, 1, 1});
+ME->update({ 0, 0, 1, 1, 1});
+ME->update({ 0, 0, 1, 1, 1});
+for(int i = 0; i < 100; i++)
+    ME->update({ 0, 0, 1, 1, 1});
+ME->update({ 0, 0, 1, 1, 1});
+ME->update({ 0, 1, 0, 1, 0});
+ME->update({ 0, 1, 0, 1, 0});
+ME->update({ 0, 1, 0, 1, 0});
+ME->update({ 0, 1, 0, 1, 0});
+ME->update({ 0, 1, 0, 1, 0});
+for(int i = 0; i < 100; i++)
+    ME->update({ 0, 1, 0, 1, 0});
+
+QVector<QPair<int,int>> test;
+
+test =ME->get_candidate(20);
 
 }
 
@@ -218,7 +287,7 @@ void MainWindow::drawNetOnLabel(QList<std::shared_ptr<neuron_AAC_type_1>> net)
     //pix1.fill( Qt::red );
     pix1->fill( Qt::white);
     QPainter *paint = new QPainter(pix1);
-    paint->setPen(*(new QColor(255,34,255,255)));
+    paint->setPen(*(new QColor(0,0,0,255)));
 
     QPoint *point = new QPoint(30, 100);
     QPoint *newPoint = new QPoint(0, 0);
@@ -229,6 +298,7 @@ void MainWindow::drawNetOnLabel(QList<std::shared_ptr<neuron_AAC_type_1>> net)
         newPoint->setX(point->x() + net.at(i)->getDrawX());
         newPoint->setY(point->y() + net.at(i)->getDrawY());
          paint->drawEllipse(*newPoint, circleRadius, circleRadius);
+         paint->drawText(newPoint->x()-3, newPoint->y()+3, net.at(i)->getLevel());
     }
 
     for(int i = 0; i < net.size(); i++)
@@ -261,3 +331,54 @@ void MainWindow::drawNetOnLabel(QList<std::shared_ptr<neuron_AAC_type_1>> net)
 //---------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------
+
+void MainWindow::defineLevel(std::shared_ptr<neuron_AAC_type_1> neuron)
+{
+    int max_level = -1;
+    int next_element = 0;
+
+    if(neuron->get_in_neurons().empty())
+    {
+        neuron->setLevel("0");
+    }
+    else
+    {
+        for(int i = 0; i < neuron->get_in_neurons().size(); i++)
+        {
+            if(neuron->get_in_neurons().at(i)->getLevel() == "")
+            {
+                defineLevel(neuron->get_in_neurons().at(i));
+                i--;
+            }
+            else
+            { //?????
+                next_element = neuron->get_in_neurons().at(i)->getLevel().toInt();
+                if(next_element >= max_level)
+                {
+                max_level = neuron->get_in_neurons().at(i)->getLevel().toInt();
+                }
+            }
+        }
+    }
+    neuron->setLevel(QString::number(max_level+1));
+}
+
+
+void MainWindow::defineStructure(QList<std::shared_ptr<neuron_AAC_type_1>> net)
+{
+
+    for(int i = 0; i < net.size(); i++) //walk through all the neurons
+    {
+        //neuron element
+         defineLevel(net.at(i));
+    }
+}
+
+
+void MainWindow::link(QList<std::shared_ptr<neuron_AAC_type_1>> net, int form, int to)
+{
+    net.at(form)->append_out_neurons(net.at(to));
+    net.at(to)->append_in_neurons(net.at(form));
+}
+
+

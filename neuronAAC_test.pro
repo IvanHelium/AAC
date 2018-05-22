@@ -27,12 +27,14 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     neuron_aac.cpp \
-    serialport.cpp
+    serialport.cpp \
+    fro.cpp
 
 HEADERS += \
         mainwindow.h \
     neuron_aac.h \
-    serialport.h
+    serialport.h \
+    fro.h
 
 FORMS += \
         mainwindow.ui

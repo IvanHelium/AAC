@@ -2,6 +2,13 @@
 #include "math.h"
 #include <iostream>
 
+
+QJsonObject ObjectFromString(const QString& in)
+{
+    QJsonValue val(in);
+    return val.toObject();
+}
+
 neuron_AAC_type_1::neuron_AAC_type_1()
 {
     ID = "";
@@ -23,16 +30,16 @@ neuron_AAC_type_1::neuron_AAC_type_1()
     P_MAX = 0.0f;
     P_MIN = 0.0f;
     in_neurons.clear();
-    size_in = 0;
     out_neurons.clear();
-    size_out = 0;
     TYPE = "neuron_type_1";
     LEVEL = "";
 
     drawX = 0;
     drawY = 0;
+
+    MAP.append(0);
 }
-neuron_AAC_type_1::neuron_AAC_type_1(std::string id, int porog_g, int porog_l, float p_min, float p_max)
+neuron_AAC_type_1::neuron_AAC_type_1(QString id, int porog_g, int porog_l, float p_min, float p_max)
 {
     ID = id;
     IMAGE.clear();
@@ -53,15 +60,16 @@ neuron_AAC_type_1::neuron_AAC_type_1(std::string id, int porog_g, int porog_l, f
     P_MAX = p_max;
     P_MIN = p_min;
     in_neurons.clear();
-    size_in = 0;
     out_neurons.clear();
-    size_out = 0;
     TYPE = "neuron_type_1";
 
     LEVEL = "";
 
     drawX = 0;
     drawY = 0;
+
+    MAP.append(0);
+
 
 }
 
@@ -215,11 +223,56 @@ std::vector<std::shared_ptr<neuron_AAC_type_1>> neuron_AAC_type_1::get_in_neuron
 {
     return in_neurons;
 }
+void neuron_AAC_type_1::set_in_neurons(std::shared_ptr<neuron_AAC_type_1> neuron, int index)
+{
+    in_neurons[index] = neuron;
+
+}
 
 std::vector<std::shared_ptr<neuron_AAC_type_1>> neuron_AAC_type_1::get_out_neurons()
 {
     return out_neurons;
 }
+
+void neuron_AAC_type_1::setLevel(QString level_str)
+{
+    LEVEL = level_str;
+}
+QString neuron_AAC_type_1::getLevel()
+{
+    return LEVEL;
+}
+
+QString neuron_AAC_type_1::getId()
+{
+    return ID;
+}
+
+
+void neuron_AAC_type_1::read(const QJsonObject &json)
+{
+
+}
+void neuron_AAC_type_1::write(QJsonObject &json) const
+{
+        json["ID"] = ObjectFromString(ID);
+        //json["IMAGE"] = IMAGE;
+        json["G"] = G;
+        json["L"] = L;
+        json["ADAPTED"] = ADAPTED;
+        json["B"] = B;
+        json["C"] = C;
+        json["OUT"] = OUT;
+        json["POROG_G"] = POROG_G;
+        json["POROG_L"] = POROG_L;
+        json["S"] = S;
+        json["Z"] = Z;
+        json["P_MAX"] = P_MAX;
+        json["P_MIN"] = P_MIN;
+
+
+}
+
 //---------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------
