@@ -2,23 +2,62 @@
 
 
 
-
-
-fro::fro()
+Fro::Fro()
 {
 
 }
 
 
+Fro::Fro(int size)
+{
+    froSize = size;
+    receptorSize = size;
+    ME = new matrixEvent(size);
+    neuronsCount = 0;
+
+}
 
 
+void Fro::appendReceptor(std::shared_ptr<neuron_AAC_type_1> candidate)
+{
+ neuronsCount++;
+ receptors.append(candidate);
+ neurons.append(candidate);
+}
 
 
+std::shared_ptr<neuron_AAC_type_1> Fro::getNeuron(int index)
+{
+    return neurons[index];
+}
 
+void Fro::defineMAP(std::shared_ptr<neuron_AAC_type_1> neuron)
+{
+    QVector<int> tempMAP;
+    tempMAP.clear();
 
-//--------------------------------------------------------------
+    if(neuron->getTYPE() == "receptor")
+    {
+        for(int i = 0; i < this->receptorSize; i++)
+        {
 
+            if(neuron->getId().toInt() == i)
+            {
+                tempMAP.append(1);
+            }
+            else
+            {
+                tempMAP.append(0);
+            }
+        }
+    }
 
+    neuron->setMAP(tempMAP);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------
 matrixEvent::matrixEvent()
 {
     QVector<int> vec2;

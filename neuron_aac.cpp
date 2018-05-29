@@ -37,9 +37,9 @@ neuron_AAC_type_1::neuron_AAC_type_1()
     drawX = 0;
     drawY = 0;
 
-    MAP.append(0);
+    //MAP.append(0);
 }
-neuron_AAC_type_1::neuron_AAC_type_1(QString id, int porog_g, int porog_l, float p_min, float p_max)
+neuron_AAC_type_1::neuron_AAC_type_1(QString type, QString id, int porog_g, int porog_l, float p_min, float p_max)
 {
     ID = id;
     IMAGE.clear();
@@ -61,14 +61,14 @@ neuron_AAC_type_1::neuron_AAC_type_1(QString id, int porog_g, int porog_l, float
     P_MIN = p_min;
     in_neurons.clear();
     out_neurons.clear();
-    TYPE = "neuron_type_1";
+    TYPE = type;
 
     LEVEL = "";
 
     drawX = 0;
     drawY = 0;
 
-    MAP.append(0);
+    //MAP.append(0);
 
 
 }
@@ -82,6 +82,20 @@ void neuron_AAC_type_1::append_out_neurons(const std::shared_ptr<neuron_AAC_type
 void neuron_AAC_type_1::append_in_neurons(const std::shared_ptr<neuron_AAC_type_1>& neuron)
 {
     in_neurons.push_back(neuron);
+}
+
+void neuron_AAC_type_1::setMAP(QVector<int> Map)
+{
+ MAP = Map;
+}
+QVector<int> neuron_AAC_type_1::getMAP()
+{
+ return MAP;
+}
+
+QString neuron_AAC_type_1::getTYPE()
+{
+    return TYPE;
 }
 
 

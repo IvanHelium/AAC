@@ -54,92 +54,26 @@ MainWindow::MainWindow(QWidget *parent) :
 
     std::shared_ptr<neuron_AAC_type_1> n03(new neuron_AAC_type_1("n03", 3, 3, 0.9, 0.9));*/
 
+    fro_test = new Fro(13);
 
-    for(int i = 0; i< 11; i++)
+    for(int i = 0; i < 13; i++)
     {
-        net1.append(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("n"+QString::number(i), 3, 3, 0.9, 0.9)));
+        fro_test->appendReceptor(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("receptor", QString::number(i), 3, 3, 0.8, 0.9)));
+        //receptors.append(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("receptor", QString::number(i), 3, 3, 0.8, 0.9)));
     }
 
-    int stepX = 50;
-    int stepY = 50;
-    net1.at(0)->setDrawX(stepX);
-    net1.at(0)->setDrawY(stepY);
-    net1.at(1)->setDrawX(stepX);
-    net1.at(1)->setDrawY(2*stepY);
-    net1.at(2)->setDrawX(stepX);
-    net1.at(2)->setDrawY(3*stepY);
-    net1.at(3)->setDrawX(stepX);
-    net1.at(3)->setDrawY(4*stepY);
-    net1.at(4)->setDrawX(stepX);
-    net1.at(4)->setDrawY(5*stepY);
-
-    net1.at(5)->setDrawX(2*stepX);
-    net1.at(5)->setDrawY(stepY + stepY/2);
-    net1.at(6)->setDrawX(2*stepX);
-    net1.at(6)->setDrawY(2*stepY + stepY/2);
-    net1.at(7)->setDrawX(2*stepX);
-    net1.at(7)->setDrawY(3*stepY + stepY/2);
-
-    net1.at(8)->setDrawX(3*stepX);
-    net1.at(8)->setDrawY(stepY);
-    net1.at(9)->setDrawX(3*stepX);
-    net1.at(9)->setDrawY(2*stepY);
-
-    net1.at(10)->setDrawX(4*stepX);
-    net1.at(10)->setDrawY(2*stepY + stepY/2);
-
-
-
-    net1.at(0)->append_out_neurons(net1.at(5));
-    net1.at(5)->append_in_neurons(net1.at(0));
-
-    net1.at(1)->append_out_neurons(net1.at(5));
-    net1.at(5)->append_in_neurons(net1.at(1));
-
-    net1.at(2)->append_out_neurons(net1.at(8));
-    net1.at(8)->append_in_neurons(net1.at(2));
-
-    net1.at(2)->append_out_neurons(net1.at(6));
-    net1.at(6)->append_in_neurons(net1.at(2));
-
-    net1.at(3)->append_out_neurons(net1.at(6));
-    net1.at(6)->append_in_neurons(net1.at(3));
-
-    net1.at(3)->append_out_neurons(net1.at(7));
-    net1.at(7)->append_in_neurons(net1.at(3));
-
-    net1.at(4)->append_out_neurons(net1.at(7));
-    net1.at(7)->append_in_neurons(net1.at(4));
-
-    net1.at(5)->append_out_neurons(net1.at(8));
-    net1.at(8)->append_in_neurons(net1.at(5));
-
-    net1.at(6)->append_out_neurons(net1.at(9));
-    net1.at(9)->append_in_neurons(net1.at(6));
-
-    net1.at(7)->append_out_neurons(net1.at(9));
-    net1.at(9)->append_in_neurons(net1.at(7));
-
-    net1.at(8)->append_out_neurons(net1.at(10));
-    net1.at(10)->append_in_neurons(net1.at(8));
-
-    net1.at(9)->append_out_neurons(net1.at(10));
-    net1.at(10)->append_in_neurons(net1.at(9));
-
-
-    //here find level of neurons
-
-    //defineStructure(net1);
-
-    //drawNetOnLabel(net1);
-
-
-    for(int i = 0; i < 9; i++)
+    for(int i = 0; i < 13; i++)
     {
-      net2.append(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("n"+QString::number(i), 3, 3, 0.9, 0.9)));
+    fro_test->defineMAP(fro_test->getNeuron(i));
     }
 
-    net2.at(0)->setDrawX(stepX);
+
+    /*for(int i = 0; i < 9; i++)
+    {
+      net2.append(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("neuron_type_1", QString::number(i), 3, 3, 0.9, 0.9)));
+    }*/
+
+    /*net2.at(0)->setDrawX(stepX);
     net2.at(0)->setDrawY(stepY);
     net2.at(3)->setDrawX(stepX);
     net2.at(3)->setDrawY(2*stepY);
@@ -158,10 +92,10 @@ MainWindow::MainWindow(QWidget *parent) :
     net2.at(2)->setDrawX(3*stepX);
     net2.at(2)->setDrawY(stepY);
     net2.at(5)->setDrawX(3*stepX);
-    net2.at(5)->setDrawY(2*stepY);
+    net2.at(5)->setDrawY(2*stepY);*/
 
 
-    link(net2, 0, 1);
+   /*link(net2, 0, 1);
     link(net2, 1, 2);
     link(net2, 3, 1);
     link(net2, 4, 2);
@@ -174,7 +108,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     defineStructure(net2);
 
-    drawNetOnLabel(net2);
+    drawNetOnLabel(net2);*/
 
 
 
@@ -206,26 +140,9 @@ ME->pad();
 ME->reset();
 
 ME->update({ 1, 1, 0, 0, 1});
-ME->update({ 1, 1, 0, 0, 1});
-ME->update({ 1, 1, 0, 0, 1});
-ME->update({ 1, 1, 0, 0, 1});
-ME->update({ 0, 0, 1, 1, 1});
-ME->update({ 0, 0, 1, 1, 1});
-ME->update({ 0, 0, 1, 1, 1});
-for(int i = 0; i < 100; i++)
-    ME->update({ 0, 0, 1, 1, 1});
-ME->update({ 0, 0, 1, 1, 1});
-ME->update({ 0, 1, 0, 1, 0});
-ME->update({ 0, 1, 0, 1, 0});
-ME->update({ 0, 1, 0, 1, 0});
-ME->update({ 0, 1, 0, 1, 0});
-ME->update({ 0, 1, 0, 1, 0});
-for(int i = 0; i < 100; i++)
-    ME->update({ 0, 1, 0, 1, 0});
 
-QVector<QPair<int,int>> test;
 
-test =ME->get_candidate(20);
+
 
 }
 
