@@ -98,16 +98,16 @@ MainWindow::MainWindow(QWidget *parent) :
     net2.at(5)->setDrawY(2*stepY);
 
 
-    link(net2, 0, 1);
-    link(net2, 1, 2);
-    link(net2, 3, 1);
-    link(net2, 4, 2);
-    link(net2, 3, 4);
-    link(net2, 4, 5);
-    link(net2, 6, 4);
-    link(net2, 7, 5);
-    link(net2, 6, 7);
-    link(net2, 8, 7);
+    //link(net2, 0, 1);
+    //link(net2, 1, 2);
+    //link(net2, 3, 1);
+    //link(net2, 4, 2);
+    //link(net2, 3, 4);
+    //link(net2, 4, 5);
+    //link(net2, 6, 4);
+    //link(net2, 7, 5);
+    //link(net2, 6, 7);
+    //link(net2, 8, 7);
 
     defineStructure(net2);
 
@@ -302,10 +302,6 @@ void MainWindow::defineStructure(QList<std::shared_ptr<neuron_AAC_type_1>> net)
 }
 
 
-void MainWindow::link(QList<std::shared_ptr<neuron_AAC_type_1>> net, int form, int to)
-{
-    net.at(form)->append_out_neurons(net.at(to));
-    net.at(to)->append_in_neurons(net.at(form));
-}
+
 
 

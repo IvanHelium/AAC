@@ -15,6 +15,7 @@ public:
     void reset();
     void update(QVector<int> vec);
     QVector<QPair<int, int> > get_candidate(int L);
+    void set_data(int i,int j, int value);
 
 
 private:
@@ -46,6 +47,8 @@ public:
 
 
     bool vectors_equal(QVector<int> vector1, QVector<int> vector2);
+
+    void link(QList<std::shared_ptr<neuron_AAC_type_1>> net, int form, int to);
 
 private:
     int froSize;

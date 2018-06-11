@@ -129,6 +129,13 @@ bool Fro::vectors_equal(QVector<int> vector1, QVector<int> vector2)
     result = true;
     return result;
 }
+//----------------------------------------------------------------------
+
+void Fro::link(QList<std::shared_ptr<neuron_AAC_type_1>> net, int form, int to)
+{
+    net.at(form)->append_out_neurons(net.at(to));
+    net.at(to)->append_in_neurons(net.at(form));
+}
 
 //----------------------------------------------------------------------
 void Fro::generator(void)
@@ -136,6 +143,9 @@ void Fro::generator(void)
    bool b = true;
    QVector<QPair<int,int>> P;
    QVector<int> neuron_map;
+   QString neuron_ID;
+   int LEVEL;
+   std::shared_ptr<neuron_AAC_type_1> neuron;
 
    P =  ME->get_candidate(20);
 
@@ -153,6 +163,30 @@ void Fro::generator(void)
             {
                 b = false;
             }
+        }
+
+        if(b)
+        {
+            neuron_ID = QString::number(froSize);
+            LEVEL =  neurons.at(P.at(i).first)->getLevel().toInt() + 1;
+
+            if(  neurons.at(P.at(i).second)->getLevel().toInt() >  neurons.at(P.at(i).first)->getLevel().toInt())
+            {
+                LEVEL  = neurons.at(P.at(i).second)->getLevel().toInt() + 1;
+            }
+
+            //create neuron
+            neuron = create_new_neuron(neuron_ID,QString::number(LEVEL));
+
+            //???
+            neuron->append_in_neurons(neurons.at(P.at(i).first));
+            link(neurons, P.at(i).first , neuron_ID.toInt());
+            link(neurons, P.at(i).second , neuron_ID.toInt());
+
+            ME->pad();
+            ME->set_data(P.at(i).first, P.at(i).second, 0);
+            ME->set_data(P.at(i).second, P.at(i).first, 0);
+
         }
 
 
@@ -270,6 +304,12 @@ QVector<QPair<int,int>> matrixEvent::get_candidate(int L)
     return P;
 
 
+}
+
+//------------------------------------------------------------------
+void matrixEvent::set_data(int i,int j, int value)
+{
+    data[i][j] = value;
 }
 
 //------------------------------------------------------------------
