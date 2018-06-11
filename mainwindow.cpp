@@ -58,8 +58,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     for(int i = 0; i < 13; i++)
     {
-        fro_test->appendReceptor(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("receptor", QString::number(i), 3, 3, 0.8, 0.9)));
-        //receptors.append(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("receptor", QString::number(i), 3, 3, 0.8, 0.9)));
+        fro_test->appendReceptor(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("receptor", QString::number(i),"0", 3, 3, 0.8, 0.9)));
+
     }
 
     for(int i = 0; i < 13; i++)
@@ -68,12 +68,15 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
 
-    /*for(int i = 0; i < 9; i++)
-    {
-      net2.append(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("neuron_type_1", QString::number(i), 3, 3, 0.9, 0.9)));
-    }*/
+    int stepX = 40;
+    int stepY = 40;
 
-    /*net2.at(0)->setDrawX(stepX);
+    for(int i = 0; i < 9; i++)
+    {
+      net2.append(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("neuron_type_1", QString::number(i),"0", 3, 3, 0.8, 0.9)));
+    }
+
+    net2.at(0)->setDrawX(stepX);
     net2.at(0)->setDrawY(stepY);
     net2.at(3)->setDrawX(stepX);
     net2.at(3)->setDrawY(2*stepY);
@@ -92,10 +95,10 @@ MainWindow::MainWindow(QWidget *parent) :
     net2.at(2)->setDrawX(3*stepX);
     net2.at(2)->setDrawY(stepY);
     net2.at(5)->setDrawX(3*stepX);
-    net2.at(5)->setDrawY(2*stepY);*/
+    net2.at(5)->setDrawY(2*stepY);
 
 
-   /*link(net2, 0, 1);
+    link(net2, 0, 1);
     link(net2, 1, 2);
     link(net2, 3, 1);
     link(net2, 4, 2);
@@ -108,9 +111,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     defineStructure(net2);
 
-    drawNetOnLabel(net2);*/
+    //bool test = fro_test->check_same(net2.at(2)->get_in_neurons(), net2.at(5)->get_in_neurons());
+
+    fro_test->create_new_neuron( QString::number(fro_test->getFroSize()), "2");
+    drawNetOnLabel(net2);
 
 
+    QVector<int> test1 = {1,1,0,0,1};
+    QVector<int> test2 = {1,1,0,0};
+
+     bool test = fro_test->vectors_equal(test1,test2);
 
     //std::vector <int> FIRST_IMAGE;
 
@@ -215,7 +225,7 @@ void MainWindow::drawNetOnLabel(QList<std::shared_ptr<neuron_AAC_type_1>> net)
         newPoint->setX(point->x() + net.at(i)->getDrawX());
         newPoint->setY(point->y() + net.at(i)->getDrawY());
          paint->drawEllipse(*newPoint, circleRadius, circleRadius);
-         paint->drawText(newPoint->x()-3, newPoint->y()+3, net.at(i)->getLevel());
+         paint->drawText(newPoint->x()-3, newPoint->y()+3, net.at(i)->getId());
     }
 
     for(int i = 0; i < net.size(); i++)

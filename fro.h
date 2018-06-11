@@ -34,6 +34,18 @@ public:
     void appendReceptor(std::shared_ptr<neuron_AAC_type_1> candidate);
     std::shared_ptr<neuron_AAC_type_1> getNeuron(int index);
     void defineMAP(std::shared_ptr<neuron_AAC_type_1> neuron);
+    bool isPair(std::shared_ptr<neuron_AAC_type_1> neuron1, std::shared_ptr<neuron_AAC_type_1> neuron2); //проверить
+
+    bool check_same(std::vector<std::shared_ptr<neuron_AAC_type_1>> arr1, std::vector<std::shared_ptr<neuron_AAC_type_1>> arr2); // проверить
+
+    QVector<int> create_map(std::shared_ptr<neuron_AAC_type_1> neuron1, std::shared_ptr<neuron_AAC_type_1> neuron2);
+
+    std::shared_ptr<neuron_AAC_type_1> create_new_neuron(QString ID, QString LEVEL);
+
+    void generator(void);
+
+
+    bool vectors_equal(QVector<int> vector1, QVector<int> vector2);
 
 private:
     int froSize;

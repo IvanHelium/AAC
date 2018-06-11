@@ -44,7 +44,7 @@ private:
 
     //neuron net
     //QList<std::shared_ptr<neuron_AAC_type_1>> net1;
-    //QList<std::shared_ptr<neuron_AAC_type_1>> net2;
+    QList<std::shared_ptr<neuron_AAC_type_1>> net2;
     Fro *fro_test;
     QList<std::shared_ptr<neuron_AAC_type_1>> receptors;
     QPixmap pix;
