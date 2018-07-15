@@ -28,7 +28,7 @@ class Fro
 {
 public:
     Fro();
-    Fro(int size);
+    Fro(int size, int tr);
     void init_fro();
     int getFroSize();
     void setFroSize(int size);
@@ -50,6 +50,15 @@ public:
 
     void link(QList<std::shared_ptr<neuron_AAC_type_1>> net, int form, int to);
 
+
+    int getTr();
+
+    void update_matrix_event();
+
+    int run(QVector <int> input_vector);
+
+    QList<std::shared_ptr<neuron_AAC_type_1>> getNeurons();
+
 private:
     int froSize;
     int receptorSize;
@@ -57,6 +66,9 @@ private:
     matrixEvent *ME;
     QList<std::shared_ptr<neuron_AAC_type_1>> receptors;
     QList<std::shared_ptr<neuron_AAC_type_1>> neurons;
+    int self_Tr;
+
+    QVector<int> activatedObrazs;
 };
 
 

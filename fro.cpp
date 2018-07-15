@@ -8,12 +8,18 @@ Fro::Fro()
 }
 
 //----------------------------------------------------------------------
-Fro::Fro(int size)
+Fro::Fro(int size, int tr)
 {
     froSize = size;
     receptorSize = size;
     ME = new matrixEvent(size);
     neuronsCount = 0;
+    self_Tr = tr;
+
+    for(int i = 0; i< size; i++)
+    {
+    activatedObrazs.append(0);
+    }
 
 }
 
@@ -35,6 +41,7 @@ std::shared_ptr<neuron_AAC_type_1> Fro::getNeuron(int index)
 {
     return neurons[index];
 }
+//----------------------------------------------------------------------
 //----------------------------------------------------------------------
 void Fro::defineMAP(std::shared_ptr<neuron_AAC_type_1> neuron)
 {
@@ -60,6 +67,7 @@ void Fro::defineMAP(std::shared_ptr<neuron_AAC_type_1> neuron)
     neuron->setMAP(tempMAP);
 
 }
+//----------------------------------------------------------------------
 //----------------------------------------------------------------------
 bool Fro::isPair(std::shared_ptr<neuron_AAC_type_1> neuron1, std::shared_ptr<neuron_AAC_type_1> neuron2)
 {
@@ -105,9 +113,11 @@ QVector<int>  Fro::create_map(std::shared_ptr<neuron_AAC_type_1> neuron1, std::s
 
 std::shared_ptr<neuron_AAC_type_1> Fro::create_new_neuron(QString ID, QString LEVEL)
 {
-  std::shared_ptr<neuron_AAC_type_1> neuron = std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("neuron_type_1", ID, LEVEL, 3, 3, 0.8, 0.9));
+  std::shared_ptr<neuron_AAC_type_1> neuron = std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("neuron_type_1", ID, LEVEL, 3, 3, 0.8, 0.9, self_Tr));
   neurons.append(neuron);
   froSize++;
+
+  activatedObrazs.append(0);
 
 return neuron;
 }
@@ -135,6 +145,11 @@ void Fro::link(QList<std::shared_ptr<neuron_AAC_type_1>> net, int form, int to)
 {
     net.at(form)->append_out_neurons(net.at(to));
     net.at(to)->append_in_neurons(net.at(form));
+}
+//----------------------------------------------------------------------
+int Fro::getTr()
+{
+    return self_Tr;
 }
 
 //----------------------------------------------------------------------
@@ -177,6 +192,8 @@ void Fro::generator(void)
 
             //create neuron
             neuron = create_new_neuron(neuron_ID,QString::number(LEVEL));
+            neuron->setMAP(neuron_map);
+            neuron->setOBRAZ(neuron_map);
 
             //???
             neuron->append_in_neurons(neurons.at(P.at(i).first));
@@ -198,6 +215,73 @@ void Fro::generator(void)
 
 //----------------------------------------------------------------------
 
+
+void Fro::update_matrix_event()
+{
+    QVector<int> vector;
+    for(int i = 0; i < activatedObrazs.size(); i++)
+    {
+        vector.append(0);
+    }
+
+    for(int j = 0; j < activatedObrazs.size(); j++)
+    {
+        vector[j] = activatedObrazs[j];
+    }
+
+    ME->update(vector);
+
+}
+
+//----------------------------------------------------------------------
+
+
+int Fro::run(QVector <int> input_vector)
+{
+    QVector<int> temp_image;
+    temp_image.clear();
+    if(input_vector.size() != receptorSize)
+    {
+        return -1;
+    }
+
+    //refresh receptors
+    for(int i = 0; i < receptorSize; i++)
+    {
+        temp_image.append(input_vector[i]);
+        receptors.at(i)->setImage(temp_image);
+        receptors.at(i)->run(temp_image);
+        receptors.at(i)->sync();
+        temp_image.clear();
+    }
+
+
+    for(int i = receptorSize; i < froSize; i++)
+    {
+        neurons.at(i)->run();
+    }
+
+    for(int i = receptorSize; i < froSize; i++)
+    {
+        neurons.at(i)->sync();
+    }
+
+    for(int i = 0; i < froSize; i++)
+    {
+        activatedObrazs[i] += neurons.at(i)->getOUT();
+    }
+
+    update_matrix_event();
+    generator();
+
+    return 0;
+}
+
+
+ QList<std::shared_ptr<neuron_AAC_type_1>> Fro::getNeurons()
+ {
+     return neurons;
+ }
 
 //----------------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------------

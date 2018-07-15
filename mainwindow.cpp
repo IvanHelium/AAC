@@ -54,15 +54,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     std::shared_ptr<neuron_AAC_type_1> n03(new neuron_AAC_type_1("n03", 3, 3, 0.9, 0.9));*/
 
-    fro_test = new Fro(13);
+    int firstFroSize = 4;
+    fro_test = new Fro(firstFroSize, 5);
 
-    for(int i = 0; i < 13; i++)
+    for(int i = 0; i < firstFroSize; i++)
     {
-        fro_test->appendReceptor(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("receptor", QString::number(i),"0", 3, 3, 0.8, 0.9)));
+        fro_test->appendReceptor(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("receptor", QString::number(i),"0", 3, 3, 0.8, 0.9, fro_test->getTr())));
 
     }
 
-    for(int i = 0; i < 13; i++)
+
+    for(int i = 0; i < firstFroSize; i++)
     {
     fro_test->defineMAP(fro_test->getNeuron(i));
     }
@@ -73,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     for(int i = 0; i < 9; i++)
     {
-      net2.append(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("neuron_type_1", QString::number(i),"0", 3, 3, 0.8, 0.9)));
+      net2.append(std::shared_ptr<neuron_AAC_type_1> (new neuron_AAC_type_1("neuron_type_1", QString::number(i),"0", 3, 3, 0.8, 0.9, 0)));
     }
 
     net2.at(0)->setDrawX(stepX);
@@ -113,14 +115,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //bool test = fro_test->check_same(net2.at(2)->get_in_neurons(), net2.at(5)->get_in_neurons());
 
-    fro_test->create_new_neuron( QString::number(fro_test->getFroSize()), "2");
+   /* fro_test->create_new_neuron( QString::number(fro_test->getFroSize()), "2");
     drawNetOnLabel(net2);
 
 
     QVector<int> test1 = {1,1,0,0,1};
     QVector<int> test2 = {1,1,0,0};
 
-     bool test = fro_test->vectors_equal(test1,test2);
+     bool test = fro_test->vectors_equal(test1,test2);*/
 
     //std::vector <int> FIRST_IMAGE;
 
@@ -143,16 +145,20 @@ MainWindow::MainWindow(QWidget *parent) :
 }*/
 
 
-matrixEvent *ME = new matrixEvent(4);
+QVector<int> testrun;// {1,1,1,1,1,1,1,1,1,1,1,1,1};
 
-ME->pad();
+for(int i = 0; i < firstFroSize; i++)
+{
+testrun.append(1);
+}
 
-ME->reset();
+for(int i = 0; i < 500; i++)
+{
+  fro_test->run(testrun);
+}
 
-ME->update({ 1, 1, 0, 0, 1});
 
-
-
+formGraphVizText(fro_test->getNeurons());
 
 }
 
@@ -303,5 +309,51 @@ void MainWindow::defineStructure(QList<std::shared_ptr<neuron_AAC_type_1>> net)
 
 
 
+void MainWindow::formGraphVizText(QList<std::shared_ptr<neuron_AAC_type_1>> net)
+{
+    std::vector<std::shared_ptr<neuron_AAC_type_1>> out_neurons;
+    QString filename="neuron_net .txt";
+    QFile file( filename );
+    if ( file.open(QIODevice::ReadWrite) )
+    {
+        QTextStream stream( &file );
+
+        stream << "graph """ << endl;
+        stream << "{" << endl;
+        stream << " #   node [fontsize=10,width=«.2», height=«.2», margin=0]; " << endl;
+        stream << "#   graph[fontsize=8];" << endl;
+        stream << "subgraph fro" << endl;
+        stream << "{" << endl;
+
+
+        for(int i = 0; i < net.size(); i++)
+        {
+            if(net.at(i)->getTYPE() == "receptor")
+            {
+                stream << "r" + net.at(i)->getId()+  "[label=r" + net.at(i)->getId() +"_l"+net.at(i)->getLevel() + "][color=red];" << endl;
+            }
+            else
+            {
+                stream << "n" + net.at(i)->getId()+  "[label=n" + net.at(i)->getId()  +"_l"+net.at(i)->getLevel() +"][color=blue];" << endl;
+            }
+
+            out_neurons = net.at(i)->get_out_neurons();
+            for(int j = 0; j < out_neurons.size(); j++)
+            {
+                if(net.at(i)->getTYPE() == "receptor")
+                {
+                    stream << "r" + net.at(i)->getId() +" -- "+ "n" +out_neurons.at(j)->getId() << endl;
+                }
+                else
+                {
+                    stream << "n" + net.at(i)->getId() +" -- "+ "n" +out_neurons.at(j)->getId() << endl;
+                }
+            }
+        }
+
+        stream << "}" << endl;
+        stream << "}" << endl;
+    }
+}
 
 

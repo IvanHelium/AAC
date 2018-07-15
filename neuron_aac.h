@@ -14,7 +14,7 @@ class neuron_AAC_type_1
 {
 public:
     neuron_AAC_type_1();
-    neuron_AAC_type_1(QString type, QString id,QString level, int porog_g, int porog_l, float p_min, float p_max);
+    neuron_AAC_type_1(QString type, QString id,QString level, int porog_g, int porog_l, float p_min, float p_max, int out_porog);
     void append_out_neurons(const std::shared_ptr<neuron_AAC_type_1>& neuron);
     void append_in_neurons(const std::shared_ptr<neuron_AAC_type_1>& neuron);
     std::vector<std::shared_ptr<neuron_AAC_type_1>> get_in_neurons();
@@ -23,6 +23,9 @@ public:
     void set_in_neurons(std::shared_ptr<neuron_AAC_type_1> neuron, int index);
     void setMAP(QVector<int> Map);
     QVector<int> getMAP();
+
+    void setImage(QVector<int> image);
+
 
     void setOBRAZ(QVector<int> Obraz);
 
@@ -35,12 +38,14 @@ public:
     QString getLevel();
     QString getId();
 
+    int getOUT();
+
     double porog();
     int block_R();
     int block_L();
     void block_T();
     void block_G();
-    void run(std::vector<int> FIRST_IMAGE);
+    void run(QVector<int> FIRST_IMAGE);
     void run();
     void sync();
     void reset();
@@ -51,7 +56,7 @@ public:
 
 private:
     QString ID;
-    std::vector<int> IMAGE;
+    QVector<int> IMAGE;
     int STEP;
     int G;
     int L;
@@ -79,6 +84,9 @@ private:
 
     QVector<int> MAP;
     QVector<int> OBRAZ;
+
+    int OUT_POROG;
+    int OUT_TAKT;
 
 
 };

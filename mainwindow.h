@@ -33,7 +33,7 @@ private slots:
     void defineStructure(QList<std::shared_ptr<neuron_AAC_type_1>> net);
     void defineLevel(std::shared_ptr<neuron_AAC_type_1> neuron);
     //void link(QList<std::shared_ptr<neuron_AAC_type_1>> net, int form, int to);
-
+    void formGraphVizText(QList<std::shared_ptr<neuron_AAC_type_1>> net);
 
 
 private:

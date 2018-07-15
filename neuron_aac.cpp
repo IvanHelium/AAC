@@ -37,9 +37,12 @@ neuron_AAC_type_1::neuron_AAC_type_1()
     drawX = 0;
     drawY = 0;
 
+    OUT_POROG = 0;
+    OUT_TAKT = 0;
+
     //MAP.append(0);
 }
-neuron_AAC_type_1::neuron_AAC_type_1(QString type, QString id, QString level, int porog_g, int porog_l, float p_min, float p_max)
+neuron_AAC_type_1::neuron_AAC_type_1(QString type, QString id, QString level, int porog_g, int porog_l, float p_min, float p_max, int out_porog)
 {
     ID = id;
     IMAGE.clear();
@@ -68,6 +71,8 @@ neuron_AAC_type_1::neuron_AAC_type_1(QString type, QString id, QString level, in
     drawX = 0;
     drawY = 0;
 
+    OUT_POROG = out_porog;
+    OUT_TAKT = out_porog;
     //MAP.append(0);
 
 
@@ -119,7 +124,7 @@ int neuron_AAC_type_1::block_R()
     B=0;
 
     double p_N_1 = porog();
-    std::vector<int> sign = IMAGE;
+    QVector<int> sign = IMAGE;
     double p_sign = 0;
 
     for(unsigned int i = 0; i < sign.size(); i++)
@@ -174,7 +179,7 @@ void neuron_AAC_type_1::block_T()
     }
 }
 
-void neuron_AAC_type_1::run(std::vector<int> FIRST_IMAGE)
+void neuron_AAC_type_1::run(QVector<int> FIRST_IMAGE)
 {
     IMAGE.clear();
 
@@ -208,7 +213,33 @@ void neuron_AAC_type_1::sync()
  STEP++;
  S = NEXT_S;
  NEXT_S = 0;
- OUT = NEXT_OUT;
+
+
+
+     if(OUT_POROG == 0)
+     {
+       OUT = NEXT_OUT;
+     }
+     else
+     {
+
+         if(OUT_TAKT > 0)
+         {
+             OUT = 1;
+             OUT_TAKT -= 1;
+         }
+         else
+         {
+             OUT = 0;
+         }
+         if(NEXT_OUT == 1)
+         {
+             OUT_TAKT = OUT_POROG;
+             OUT = 1;
+             NEXT_OUT = 0;
+         }
+
+     }
 
 }
 
@@ -268,6 +299,15 @@ QString neuron_AAC_type_1::getId()
     return ID;
 }
 
+void neuron_AAC_type_1::setImage(QVector<int> image)
+{
+ IMAGE = image;
+}
+
+int neuron_AAC_type_1::getOUT()
+{
+    return OUT;
+}
 
 void neuron_AAC_type_1::read(const QJsonObject &json)
 {
