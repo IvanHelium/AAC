@@ -14,6 +14,11 @@
 #include <QPoint>
 
 
+
+
+
+
+
 bool connect_check=false;
 QString netFileName = "netfile.txt";
 
@@ -33,7 +38,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(timer, SIGNAL(timeout()), this, SLOT(timer_update()));
     timer->start(5000);
 
+    QTimer *timer_action = new QTimer(this);
+    connect(timer_action, SIGNAL(timeout()), this, SLOT(timer_action_update()));
+    timer_action->start(2000);
+
+
+
     connect(serial, &SerialPort::sensorDataSignal, this, &MainWindow::debugSensorView);
+
+    connect(serial, &SerialPort::sensorDataSignal, this, &MainWindow::prase_sensor_data);
 
 
 
@@ -54,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     std::shared_ptr<neuron_AAC_type_1> n03(new neuron_AAC_type_1("n03", 3, 3, 0.9, 0.9));*/
 
-    int firstFroSize = 4;
+    int firstFroSize = 14;
     fro_test = new Fro(firstFroSize, 5);
 
     for(int i = 0; i < firstFroSize; i++)
@@ -143,22 +156,42 @@ MainWindow::MainWindow(QWidget *parent) :
     n03->run();
     n03->sync();
 }*/
+QVector<QVector<int>> testpattern;
+
+testpattern = generate_test_data();
 
 
-QVector<int> testrun;// {1,1,1,1,1,1,1,1,1,1,1,1,1};
+QVector<int> testgrade = { 2000, 2, 10, 4, 10, 1000, 1000, 600, 600, 300, 300, 160, 120, 80 };
 
+evaluationSystem = new EvaluationSystem(true,testgrade);
+
+//evaluationSystem.setInputGrade(testgrade);
+
+
+
+QVector<int> testrun =  {1,0,0,0,1,0,0,0,0,0,0,0,0,1};
+/*
 for(int i = 0; i < firstFroSize; i++)
 {
 testrun.append(1);
-}
+}*/
 
-for(int i = 0; i < 500; i++)
+for(int i = 0; i < 120 * 90; i++)
 {
+   testrun = testpattern[randInt(0,89)];
   fro_test->run(testrun);
+  if(i % 500 == 0)
+  {
+    formGraphVizText(fro_test->getNeurons());
+  }
+  qDebug() << "debug still running at i =" << i << endl;
 }
 
 
 formGraphVizText(fro_test->getNeurons());
+
+
+neuronKnowledgeBase = new NeuronKnowledgeBase(true, testgrade);
 
 }
 
@@ -207,6 +240,227 @@ void MainWindow::timer_update()
 //
 //---------------------------------------------------------------------------------------------------
 
+void MainWindow::timer_action_update()
+{
+    QVector<int> FRO_vector_run_current;
+    QVector<int> FRO_vector_run_previous;
+    int actionIndexPrevious;
+    qDebug() << "timer action event " << endl;
+    int rand = randInt(0,5);
+
+
+
+
+    if(abs(sensordata.previous_distance - sensordata.current_distance) <=2)
+    {
+        sensordata.same_distance = 1;
+        sensordata.closer_distance = 0;
+        sensordata.longer_distance = 0;
+    }
+    else
+    {
+        if((sensordata.previous_distance - sensordata.current_distance) > 0)
+        {
+            sensordata.same_distance = 0;
+            sensordata.closer_distance = 1;
+            sensordata.longer_distance = 0;
+
+        }
+        else
+        {
+            sensordata.same_distance = 0;
+            sensordata.closer_distance = 0;
+            sensordata.longer_distance = 1;
+        }
+    }
+    FRO_vector_run_current.clear();
+    FRO_vector_run_current.append((int)sensordata.no_sensor);
+    FRO_vector_run_current.append((int)sensordata.tactile_forward_sensor);
+    FRO_vector_run_current.append((int)sensordata.range_left_sensor);
+    FRO_vector_run_current.append((int)sensordata.range_center_sensor);
+    FRO_vector_run_current.append((int)sensordata.range_right_sensor);
+
+    FRO_vector_run_current.append((int)sensordata.direction_0_30_left_5);
+    FRO_vector_run_current.append((int)sensordata.direction_0_30_right_6);
+    FRO_vector_run_current.append((int)sensordata.direction_30_180_left_7);
+    FRO_vector_run_current.append((int)sensordata.direction_30_180_right_8);
+    FRO_vector_run_current.append((int)sensordata.direction_180_360_left_9);
+    FRO_vector_run_current.append((int)sensordata.direction_180_360_right_10);
+
+    FRO_vector_run_current.append((int)sensordata.closer_distance);
+    FRO_vector_run_current.append((int)sensordata.same_distance);
+    FRO_vector_run_current.append((int)sensordata.longer_distance);
+
+
+    neuronKnowledgeBase->setKnowledgeBasePatternCurrent(FRO_vector_run_current); //result pattern
+    FRO_vector_run_previous = neuronKnowledgeBase->getKnowledgeBasePatternPrevious(); //previous pattern
+    actionIndexPrevious = neuronKnowledgeBase->getLastActionIndex(); //previous action
+
+    //run knowladgebase and save and manage
+
+    //and choose action
+
+
+
+
+    neuronKnowledgeBase->setLastActionIndex(actionIndexPrevious);
+    neuronKnowledgeBase->setKnowledgeBasePatternPrevious(FRO_vector_run_current);
+
+    //fro_test->run(FRO_vector_run);
+
+
+
+
+    ui->label->setText("number of FRO neurons: " + QString::number(fro_test->getNeurons().size()));
+    formGraphVizText(fro_test->getNeurons());
+
+    switch(rand)
+    {
+      case 0:
+        serial->sendDriveForward();
+        break;
+      case 1:
+        serial->sendDriveForwardLeft();
+        break;
+      case 2:
+        serial->sendDriveForwardRight();
+        break;
+      case 3:
+        serial->sendDriveBack();
+        break;
+      case 4:
+        serial->sendDriveBackLeft();
+        break;
+      case 5:
+        serial->sendDriveBackRight();
+        break;
+      default:
+        serial->sendDriveForward();
+    }
+     sensordata.previous_distance = sensordata.current_distance;
+
+}
+//---------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------
+int MainWindow::randInt(int low, int high)
+{
+    // Random number between low and high
+    return qrand() % ((high + 1) - low) + low;
+}
+//---------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------
+
+QVector<QVector<int>> MainWindow::generate_test_data()
+{
+    QVector<QVector<int>> testrun;// =  {1,0,1,0,0,0,0,1,0,1};
+
+    QVector<int> vector = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+
+
+        for(int j = 0; j < 5; j++)
+        {
+
+
+
+            for(int k = 5; k < 11; k++)
+            {
+
+
+                for(int t = 11; t < 14; t++)
+                {
+                    vector = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+                    vector[j] = 1;
+                    vector[k] = 1;
+                    vector[t] = 1;
+
+                    testrun.append(vector);
+                }
+            }
+        }
+
+
+
+return testrun;
+
+}
+//---------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------
+
+void MainWindow::prase_sensor_data(uint8_t tact_sensor_data,uint8_t direction_to_resource,uint8_t direction_to_resource_sign, uint8_t distance_to_recource)
+{
+
+
+    sensordata.current_distance = distance_to_recource;
+
+
+    sensordata.tactile_forward_sensor = tact_sensor_data & 0x01 == 0x01;
+    sensordata.range_left_sensor = tact_sensor_data & 0x02 == 0x02;
+    sensordata.range_center_sensor = tact_sensor_data & 0x04 == 0x04;
+    sensordata.range_right_sensor = tact_sensor_data & 0x08 == 0x08;
+
+
+
+
+            if((sensordata.tactile_forward_sensor == 0) && (sensordata.range_left_sensor == 0) && (sensordata.range_center_sensor == 0) && (sensordata.range_right_sensor == 0))
+            {
+                sensordata.no_sensor = 1;
+            }
+
+    sensordata.direction_0_30_left_5 = 0;
+    sensordata.direction_0_30_right_6 = 0;
+    sensordata.direction_30_180_left_7 = 0;
+    sensordata.direction_30_180_right_8 = 0;
+    sensordata.direction_180_360_left_9 = 0;
+    sensordata.direction_180_360_right_10 = 0;
+
+    sensordata.no_sensor = 0;
+
+    if(!direction_to_resource_sign)
+    {
+        if(direction_to_resource >= 0 && direction_to_resource < 30)
+        {
+            sensordata.direction_0_30_left_5 = 1;
+        }
+        else if(direction_to_resource >= 30 && direction_to_resource < 180)
+        {
+            sensordata.direction_30_180_left_7 = 1;
+        }
+        else if(direction_to_resource >= 180 && direction_to_resource < 360)
+        {
+            sensordata.direction_180_360_left_9 = 1;
+        }
+
+
+    }
+    else
+    {
+        if(direction_to_resource >= 0 && direction_to_resource < 30)
+        {
+            sensordata.direction_0_30_right_6 = 1;
+        }
+        else if(direction_to_resource >= 30 && direction_to_resource < 180)
+        {
+            sensordata.direction_30_180_right_8 = 1;
+        }
+        else if(direction_to_resource >= 180 && direction_to_resource < 360)
+        {
+            sensordata.direction_180_360_right_10 = 1;
+        }
+    }
+
+
+
+
+
+
+}
+//---------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------
 void MainWindow::debugSensorView(uint8_t tact_sensor_data,uint8_t direction_to_resource,uint8_t direction_to_resource_sign, uint8_t distance_to_recource)
 {
     qDebug() << "sensor  = " << QString::number(tact_sensor_data) << "direction = " << QString::number(direction_to_resource) << "\n  sign" << QString::number(direction_to_resource_sign)<< "\n  distance" << QString::number(distance_to_recource);

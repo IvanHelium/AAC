@@ -75,6 +75,20 @@ bool Fro::isPair(std::shared_ptr<neuron_AAC_type_1> neuron1, std::shared_ptr<neu
     result = check_same(neuron1->get_in_neurons(), neuron2->get_in_neurons());
     return result;
 }
+
+bool Fro::intersectingMap(QVector<int> neuron_map1, QVector<int> neuron_map2)
+{
+    int mapSize = receptorSize;
+
+    for(int i = 0; i < receptorSize; i++)
+    {
+         if((neuron_map1.at(i) == 1) && (neuron_map2.at(i) == 1))
+         {
+            return false;
+         }
+    }
+    return true;
+}
 //----------------------------------------------------------------------
 bool Fro::check_same(std::vector<std::shared_ptr<neuron_AAC_type_1>> arr1, std::vector<std::shared_ptr<neuron_AAC_type_1>> arr2)
 {
@@ -82,7 +96,7 @@ bool Fro::check_same(std::vector<std::shared_ptr<neuron_AAC_type_1>> arr1, std::
     {
         for(int j = 0; j < arr2.size(); j++)
         {
-            if(arr1[i] == arr2[j])
+            if(arr1[i]->getId() == arr2[j]->getId())
             {
                 return false;
             }
@@ -170,14 +184,25 @@ void Fro::generator(void)
         b = true;
 
         b = isPair(neurons.at(P.at(i).first), neurons.at(P.at(i).second));
+        b = intersectingMap(neurons.at(P.at(i).first)->getMAP(), neurons.at(P.at(i).second)->getMAP());
 
-        for(int j = 0; j < neurons.size();j++)
+        for(int j = receptorSize; j < neurons.size();j++)
         {
 
             if(vectors_equal(neuron_map, neurons.at(j)->getMAP()))
             {
                 b = false;
+                break;
             }
+            if(intersectingMap(neuron_map, neurons.at(j)->getMAP()))
+            {
+                b = false;
+                break;
+            }
+
+
+
+
         }
 
         if(b)

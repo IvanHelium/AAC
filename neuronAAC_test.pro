@@ -28,13 +28,15 @@ SOURCES += \
         mainwindow.cpp \
     neuron_aac.cpp \
     serialport.cpp \
-    fro.cpp
+    fro.cpp \
+    neuronknowledgebase.cpp
 
 HEADERS += \
         mainwindow.h \
     neuron_aac.h \
     serialport.h \
-    fro.h
+    fro.h \
+    neuronknowledgebase.h
 
 FORMS += \
         mainwindow.ui

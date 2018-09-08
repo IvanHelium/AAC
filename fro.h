@@ -36,6 +36,7 @@ public:
     std::shared_ptr<neuron_AAC_type_1> getNeuron(int index);
     void defineMAP(std::shared_ptr<neuron_AAC_type_1> neuron);
     bool isPair(std::shared_ptr<neuron_AAC_type_1> neuron1, std::shared_ptr<neuron_AAC_type_1> neuron2); //проверить
+    bool intersectingMap(QVector<int> neuron_map1, QVector<int> neuron_map2);
 
     bool check_same(std::vector<std::shared_ptr<neuron_AAC_type_1>> arr1, std::vector<std::shared_ptr<neuron_AAC_type_1>> arr2); // проверить
 
