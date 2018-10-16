@@ -156,9 +156,9 @@ MainWindow::MainWindow(QWidget *parent) :
     n03->run();
     n03->sync();
 }*/
-QVector<QVector<int>> testpattern;
+QVector<QVector<int>> input_patterns_list;
 
-testpattern = generate_test_data();
+input_patterns_list = generate_test_data();
 
 
 QVector<int> testgrade = { 2000, 2, 10, 4, 10, 1000, 1000, 600, 600, 300, 300, 160, 120, 80 };
@@ -175,10 +175,11 @@ for(int i = 0; i < firstFroSize; i++)
 {
 testrun.append(1);
 }*/
-
+//building neuron net
+/*
 for(int i = 0; i < 120 * 90; i++)
 {
-   testrun = testpattern[randInt(0,89)];
+   testrun = input_patterns_list[randInt(0,89)];
   fro_test->run(testrun);
   if(i % 500 == 0)
   {
@@ -188,10 +189,13 @@ for(int i = 0; i < 120 * 90; i++)
 }
 
 
-formGraphVizText(fro_test->getNeurons());
+formGraphVizText(fro_test->getNeurons());*/
 
 
-neuronKnowledgeBase = new NeuronKnowledgeBase(true, testgrade);
+neuronKnowledgeBase = new NeuronKnowledgeBase(input_patterns_list, true, testgrade, 6);
+
+
+
 
 }
 

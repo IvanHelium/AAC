@@ -3,6 +3,7 @@
 
 #include "neuron_aac.h"
 #include <QTimer>
+#include <QPair>
 
 
 class EvaluationSystem
@@ -27,7 +28,7 @@ class NeuronKnowledgeBase
 {
 public:
     NeuronKnowledgeBase();
-    NeuronKnowledgeBase(bool positivegrade, QVector<int> inputgrade);
+    NeuronKnowledgeBase(QVector<QVector<int>> input_combinations, bool positivegrade, QVector<int> inputgrade, int number_of_action);
 
     void setKnowledgeBasePatternCurrent(QVector<int> knowledgeBasePatternCurrentInput);
     QVector<int> getKnowledgeBasePatternCurrent();
@@ -37,12 +38,15 @@ public:
     void setLastActionIndex(int index);
     int getLastActionIndex();
 
+    void doubleSort(QVector<int> &sorted_mass,  QVector<QPair<QVector<int>, int> > &connected_sorted_mass);
+
+    int run( QVector<int> FRO_vector_run_previous);
+
 
 
 private:
-    QList<std::shared_ptr<neuron_AAC_type_1>> Patterns; //de
-    QList<std::shared_ptr<neuron_AAC_type_1>> sortedPatterns;//de
-    QList<int> actions;//de
+    QList<std::shared_ptr<neuron_AAC_type_1>> Patterns;
+    int actions;//de
     int L; //variable indicate neuron threshold , used for counting actions
 
     EvaluationSystem *evaluationSystem;
@@ -51,6 +55,14 @@ private:
     QVector<int> knowledgeBasePatternPrevious;
 
     int lastActionIndex;
+
+
+    QVector<QPair<QVector<int>,int>> sortend_input_pattern;
+
+    QVector<int> gradeTable;
+
+    QVector<QVector<int>> basic_input_combinations;
+
 };
 
 
