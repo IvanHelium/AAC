@@ -54,6 +54,9 @@ public:
     int getDrawX();
     int getDrawY();
 
+    int get_L_debug();
+    void set_L_debug(int value);
+
 private:
     QString ID;
     QVector<int> IMAGE;

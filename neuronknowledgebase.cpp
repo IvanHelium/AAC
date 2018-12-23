@@ -1,15 +1,25 @@
 #include "neuronknowledgebase.h"
 
+#include <QTime>
+#include <QDateTime>
 
+#include <QDebug>
+#include <QtGlobal>
+#include <QTextCodec>
+
+#define MAX_ACTIONS 6
 
 NeuronKnowledgeBase::NeuronKnowledgeBase()
 {
+    srand(time(nullptr));
     QVector<int> inputgrade = { 0, 0, 0 };
     evaluationSystem = new EvaluationSystem(true,inputgrade);
+
 }
 
-NeuronKnowledgeBase::NeuronKnowledgeBase(QVector<QVector<int>> input_combinations, bool positivegrade, QVector<int> inputgrade, int number_of_action)
+NeuronKnowledgeBase::NeuronKnowledgeBase(QVector<QVector<int>> input_combinations, bool positivegrade, QVector<int> inputgrade, int number_of_action, int unique_pattern_window_iterration)
 {
+    srand(time(nullptr));
     evaluationSystem = new EvaluationSystem(positivegrade,inputgrade);
 
     QPair<QVector<int>,int> temp;
@@ -30,9 +40,9 @@ NeuronKnowledgeBase::NeuronKnowledgeBase(QVector<QVector<int>> input_combination
     //need sort
     doubleSort(gradeTable, sortend_input_pattern);
 
-    for(int i = 0; i < input_combinations.size() * input_combinations.size() * number_of_action; i++)
+    for(int i = 0; i < (input_combinations.size()) * (input_combinations.size()) * (number_of_action); i++)
     {
-       Patterns.append(std::shared_ptr<neuron_AAC_type_1>(new neuron_AAC_type_1("neuron_type_1", QString::number(i),"0", 3, 10, 0.8, 1.0, 0)));
+       Patterns.append(std::shared_ptr<neuron_AAC_type_1>(new neuron_AAC_type_1("neuron_type_1", QString::number(i),"0", 3, 2, 0.6, 1.0, 0)));
     }
     actions = number_of_action;
 
@@ -94,20 +104,151 @@ void NeuronKnowledgeBase::setLastActionIndex(int index)
 //-------------------------------------------------------------------------------------------------
 int NeuronKnowledgeBase::getLastActionIndex()
 {
+ if(lastActionIndex < 0)
+ {
+     lastActionIndex = 0;
+ }
  return lastActionIndex;
 }
 
 
 //-------------------------------------------------------------------------------------------------
 
-int NeuronKnowledgeBase::run(QVector<int> FRO_vector_run_previous)
+int NeuronKnowledgeBase::run()
 {
+    QDateTime start = QDateTime::currentDateTime();
+
+
+
+    int count = 0;
+    volatile int out_temp =0;
     int action_answer = -1;
-    //first we need to save previous result
-    //accept current pattern and action and try to get result
+
+    volatile double filled_layer= 0.00000;
+
+    int basic_input_combinations_index = -1;
+
+    QVector<int> pattern_input_to_knowladgebase_offer = {1, 0, 1};
+    QVector<int> pattern_full_save = {1, 1, 1};
+
+    int i1 = 0; //to knowladgebase neuron index
+    int j1 = 0; //to knowladgebase neuron index
+    int k1 = 0; //to knowladgebase neuron index
+
+    for(int i = 0; i < basic_input_combinations.size(); i++) //finding index of current pattern
+    {
+        if(knowledgeBasePatternCurrent == basic_input_combinations.at(i))
+        {
+            basic_input_combinations_index = i;
+            break;
+        }
+    }
 
 
-    //next we need to offer new action
+       // qDebug() << QString::number(basic_input_combinations_index) << endl;
+
+
+
+
+
+    j1 = lastActionIndex;
+    if(j1 < 0 || j1 > MAX_ACTIONS - 1)
+    {
+        j1=0;
+    }
+
+    for(int i = 0; i < sortend_input_pattern.size(); i++) //apply index to k1 index for database
+    {
+        if(sortend_input_pattern.at(i).second == basic_input_combinations_index)
+        {
+            k1 = i;  //current pattern = previous result puttern
+        }
+    }
+
+
+    for(int i = 0; i < basic_input_combinations.size(); i++) //finding index of previous  pattern
+    {
+        if(knowledgeBasePatternPrevious == basic_input_combinations.at(i))
+        {
+            basic_input_combinations_index = i;
+            break;
+        }
+    }
+
+    for(int i = 0; i < sortend_input_pattern.size(); i++) //apply index to i1 index for database
+    {
+        if(sortend_input_pattern.at(i).second == basic_input_combinations_index)
+        {
+            i1 = i;  //current pattern = previous result puttern
+        }
+    }
+
+    //now we have all 3 index to save to database
+
+
+     if ((i1+1 * j1+1 * k1+1) > 48600 -1)
+     {
+      //  qDebug() << " out of  f index  = " + QString::number((i1+1) * (j1+1) * (k1+1)) << endl <<  " i1 =" +QString::number(i1) + " j1 " + QString::number(j1) + " k1 =" +QString::number(k1);
+     }
+    Patterns.at((i1*6*90) + (j1*90) + (k1))->run(pattern_full_save);
+    Patterns.at((i1*6*90) + (j1*90) + (k1))->sync();
+    Patterns.at((i1*6*90) + (j1*90) + (k1))->reset(); //reset because it is database
+
+    qDebug() <<  QString::number(Patterns.at((i1*6*90) + (j1*90) + (k1))->get_L_debug()) << endl;
+
+    if((i1+1) > 88 && (k1 + 1) > 88  )
+    {
+    qCritical() << "(i1+1) * (j1+1) * (k1+1) = "+ QString::number((i1+1) * (j1+1) * (k1+1)) << endl;
+    }
+
+    for(int i = k1; i < k1 + 6*90; i++) //тут ошибка
+    {
+        //qDebug() <<" i = " + QString::number(i);
+        Patterns.at(i)->run(pattern_input_to_knowladgebase_offer);
+        Patterns.at(i)->sync();
+
+        out_temp = Patterns.at(i)->getOUT();
+
+
+
+
+
+        if(out_temp == 1)
+        {
+            count++;
+            //qCritical() << " out_pattern " + QString::number(out_temp) + " i = " + QString::number(i) << endl;
+            //find answer
+            if(action_answer == -1)
+            {
+            action_answer = i % (90 * 6);
+            }
+
+            filled_layer +=  1.0 / (6.0 * 90.0);
+        }
+
+     Patterns.at(i)->reset(); //reset because it is database
+    }
+     qDebug() << "count = " + QString::number(count) << endl;
+
+    QDateTime finish = QDateTime::currentDateTime();
+
+    int msecs = finish.time().msecsTo(start.time());
+
+
+
+
+
+
+    if(filled_layer < 1.01)
+    {
+        action_answer = rand()%6;
+        debug_text = QString::number(filled_layer, 'f', 15) + " time in ms : " + QString::number(msecs);
+    }
+
+    if(action_answer == -1)
+        return 0;
+
+    return action_answer;
 
 
 }
@@ -115,7 +256,62 @@ int NeuronKnowledgeBase::run(QVector<int> FRO_vector_run_previous)
 
 //-------------------------------------------------------------------------------------------------
 
+void NeuronKnowledgeBase::save_KnowledgeBase_to_file(QString path)
+{
 
+    QString Hfilename = path;
+
+    QFile fileH( Hfilename );
+
+    if(fileH.open(QIODevice::WriteOnly ))
+    {
+        QTextStream stream( &fileH );
+        if(!Patterns.empty())
+        {
+            for(int i = 0; i < Patterns.size(); i++)
+            {
+                stream << QString::number(Patterns.at(i)->get_L_debug()) + "\n";
+
+            }
+        }
+        fileH.close();
+
+    }
+
+
+}
+
+void NeuronKnowledgeBase::load_knowladgebase_from_file(QString path)
+{
+    QString Hfilename = path;
+
+    QFile fileH( Hfilename );
+
+    if(fileH.open(QIODevice::ReadOnly ))
+    {
+        QTextStream stream( &fileH );
+        if(!Patterns.empty())
+        {
+            for(int i = 0; i < Patterns.size(); i++)
+            {
+                  Patterns.at(i)->set_L_debug(stream.readLine().toInt());
+            }
+        }
+        fileH.close();
+
+    }
+
+}
+//-------------------------------------------------------------------------------------------------
+
+
+//-------------------------------------------------------------------------------------------------
+
+
+QString NeuronKnowledgeBase::get_debug_text()
+{
+    return debug_text;
+}
 
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------

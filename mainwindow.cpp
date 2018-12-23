@@ -20,7 +20,7 @@
 
 
 bool connect_check=false;
-QString netFileName = "netfile.txt";
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -40,7 +40,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QTimer *timer_action = new QTimer(this);
     connect(timer_action, SIGNAL(timeout()), this, SLOT(timer_action_update()));
-    timer_action->start(2000);
+    timer_action->start(20); //2000
+
+    QTimer *timer_save_knowladgebase = new QTimer(this);
+    connect(timer_save_knowladgebase, SIGNAL(timeout()), this, SLOT(timer_save_kb_update()));
+    timer_save_knowladgebase->start(5000);
 
 
 
@@ -156,7 +160,7 @@ MainWindow::MainWindow(QWidget *parent) :
     n03->run();
     n03->sync();
 }*/
-QVector<QVector<int>> input_patterns_list;
+//QVector<QVector<int>> input_patterns_list;
 
 input_patterns_list = generate_test_data();
 
@@ -192,9 +196,9 @@ for(int i = 0; i < 120 * 90; i++)
 formGraphVizText(fro_test->getNeurons());*/
 
 
-neuronKnowledgeBase = new NeuronKnowledgeBase(input_patterns_list, true, testgrade, 6);
+neuronKnowledgeBase = new NeuronKnowledgeBase(input_patterns_list, true, testgrade, 6, 40);
 
-
+neuronKnowledgeBase->load_knowladgebase_from_file("../knowladgebase.txt");
 
 
 }
@@ -238,6 +242,19 @@ void MainWindow::timer_update()
     //serial->sendDriveForward();
     serial->sendDriveBackRight();
 }
+//---------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------
+void MainWindow::timer_save_kb_update()
+{
+    if(neuronKnowledgeBase != nullptr)
+    {
+        //qDebug() << "saving..." << endl;
+        neuronKnowledgeBase->save_KnowledgeBase_to_file( "../knowladgebase.txt" );
+    }
+
+}
+
 
 
 //---------------------------------------------------------------------------------------------------
@@ -248,13 +265,13 @@ void MainWindow::timer_action_update()
 {
     QVector<int> FRO_vector_run_current;
     QVector<int> FRO_vector_run_previous;
-    int actionIndexPrevious;
-    qDebug() << "timer action event " << endl;
+    int actionIndexPrevious = 0;
+    //qDebug() << "timer action event " << endl;
     int rand = randInt(0,5);
 
 
 
-
+    /*
     if(abs(sensordata.previous_distance - sensordata.current_distance) <=2)
     {
         sensordata.same_distance = 1;
@@ -294,31 +311,42 @@ void MainWindow::timer_action_update()
     FRO_vector_run_current.append((int)sensordata.closer_distance);
     FRO_vector_run_current.append((int)sensordata.same_distance);
     FRO_vector_run_current.append((int)sensordata.longer_distance);
+    */
 
+
+    QVector<int> testrun;
+    testrun = input_patterns_list[randInt(0,89)];
+
+
+    /*
+    FRO_vector_run_current = testrun;
 
     neuronKnowledgeBase->setKnowledgeBasePatternCurrent(FRO_vector_run_current); //result pattern
     FRO_vector_run_previous = neuronKnowledgeBase->getKnowledgeBasePatternPrevious(); //previous pattern
     actionIndexPrevious = neuronKnowledgeBase->getLastActionIndex(); //previous action
 
+
+
+
     //run knowladgebase and save and manage
 
     //and choose action
 
-
+    actionIndexPrevious = neuronKnowledgeBase->run();
 
 
     neuronKnowledgeBase->setLastActionIndex(actionIndexPrevious);
-    neuronKnowledgeBase->setKnowledgeBasePatternPrevious(FRO_vector_run_current);
-
-    //fro_test->run(FRO_vector_run);
+    neuronKnowledgeBase->setKnowledgeBasePatternPrevious(FRO_vector_run_current);*/
 
 
 
 
-    ui->label->setText("number of FRO neurons: " + QString::number(fro_test->getNeurons().size()));
+
+
+    ui->label->setText("action index: " + QString::number(actionIndexPrevious) + " fill row " + neuronKnowledgeBase->get_debug_text());
     formGraphVizText(fro_test->getNeurons());
 
-    switch(rand)
+    switch(actionIndexPrevious)
     {
       case 0:
         serial->sendDriveForward();

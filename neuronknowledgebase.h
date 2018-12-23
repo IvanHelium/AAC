@@ -5,6 +5,13 @@
 #include <QTimer>
 #include <QPair>
 
+#include <QCoreApplication>
+#include <QFile>
+#include <QTextStream>
+
+#include <cstdlib>
+#include <iostream>
+#include <ctime>
 
 class EvaluationSystem
 {
@@ -28,7 +35,7 @@ class NeuronKnowledgeBase
 {
 public:
     NeuronKnowledgeBase();
-    NeuronKnowledgeBase(QVector<QVector<int>> input_combinations, bool positivegrade, QVector<int> inputgrade, int number_of_action);
+    NeuronKnowledgeBase(QVector<QVector<int>> input_combinations, bool positivegrade, QVector<int> inputgrade, int number_of_action, int unique_pattern_window_iterration);
 
     void setKnowledgeBasePatternCurrent(QVector<int> knowledgeBasePatternCurrentInput);
     QVector<int> getKnowledgeBasePatternCurrent();
@@ -40,7 +47,13 @@ public:
 
     void doubleSort(QVector<int> &sorted_mass,  QVector<QPair<QVector<int>, int> > &connected_sorted_mass);
 
-    int run( QVector<int> FRO_vector_run_previous);
+    int run();
+
+    QString get_debug_text();
+
+    void save_KnowledgeBase_to_file(QString path);
+
+    void load_knowladgebase_from_file(QString path);
 
 
 
@@ -62,6 +75,8 @@ private:
     QVector<int> gradeTable;
 
     QVector<QVector<int>> basic_input_combinations;
+
+    QString debug_text;
 
 };
 

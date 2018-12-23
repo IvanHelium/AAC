@@ -29,14 +29,16 @@ SOURCES += \
     neuron_aac.cpp \
     serialport.cpp \
     fro.cpp \
-    neuronknowledgebase.cpp
+    neuronknowledgebase.cpp \
+    robot_simulator.cpp
 
 HEADERS += \
         mainwindow.h \
     neuron_aac.h \
     serialport.h \
     fro.h \
-    neuronknowledgebase.h
+    neuronknowledgebase.h \
+    robot_simulator.h
 
 FORMS += \
         mainwindow.ui

@@ -61,6 +61,7 @@ private slots:
     void on_actionConnect_triggered(bool checked);
     void timer_update();
     void timer_action_update();
+    void timer_save_kb_update();
     void debugSensorView(uint8_t tact_sensor_data,uint8_t direction_to_resource,uint8_t direction_to_resource_sign, uint8_t distance_to_recource);
 
     int randInt(int low, int high);
@@ -97,7 +98,7 @@ private:
     NeuronKnowledgeBase *neuronKnowledgeBase;
 
     //QRandomGenerator
-
+    QVector<QVector<int>> input_patterns_list;
 
 
 };
