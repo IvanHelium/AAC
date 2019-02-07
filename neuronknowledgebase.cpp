@@ -201,33 +201,48 @@ int NeuronKnowledgeBase::run()
     qCritical() << "(i1+1) * (j1+1) * (k1+1) = "+ QString::number((i1+1) * (j1+1) * (k1+1)) << endl;
     }
 
-    for(int i = k1; i < k1 + 6*90; i++) //тут ошибка
+
+
+    int index_to_offer = 0;
+
+    for(int k = 0; k < 90; k++) //k
     {
-        //qDebug() <<" i = " + QString::number(i);
-        Patterns.at(i)->run(pattern_input_to_knowladgebase_offer);
-        Patterns.at(i)->sync();
-
-        out_temp = Patterns.at(i)->getOUT();
-
-
-
-
-
-        if(out_temp == 1)
+        for(int j=0; j < 6; j++)
         {
-            count++;
-            //qCritical() << " out_pattern " + QString::number(out_temp) + " i = " + QString::number(i) << endl;
-            //find answer
-            if(action_answer == -1)
+            index_to_offer = k1 * 6 * 90 + j * 90 + k;
+
+            Patterns.at(index_to_offer)->run(pattern_input_to_knowladgebase_offer);
+            Patterns.at(index_to_offer)->sync();
+
+            out_temp = Patterns.at(index_to_offer)->getOUT();
+
+
+            if(out_temp == 1)
             {
-            action_answer = i % (90 * 6);
+                count++;
+                //qCritical() << " out_pattern " + QString::number(out_temp) + " i = " + QString::number(i) << endl;
+                //find answer
+                if(action_answer == -1)
+                {
+                action_answer = index_to_offer % (90 * 6); //???
+                }
+
+                filled_layer +=  1.0 / (6.0 * 90.0); //???
             }
 
-            filled_layer +=  1.0 / (6.0 * 90.0);
-        }
+            Patterns.at(index_to_offer)->reset(); //reset because it is database
 
-     Patterns.at(i)->reset(); //reset because it is database
+        }
     }
+
+
+
+
+
+
+
+
+
      qDebug() << "count = " + QString::number(count) << endl;
 
     QDateTime finish = QDateTime::currentDateTime();
@@ -236,7 +251,7 @@ int NeuronKnowledgeBase::run()
 
 
 
-
+    //rand on not rand
 
 
     if(filled_layer < 1.01)
@@ -253,6 +268,13 @@ int NeuronKnowledgeBase::run()
 
 }
 
+//-------------------------------------------------------------------------------------------------
+double NeuronKnowledgeBase::probability_of_choosing_a_random_action(int max_length, int current_index)
+{
+
+
+    return 0.0;
+}
 
 //-------------------------------------------------------------------------------------------------
 

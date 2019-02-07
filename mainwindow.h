@@ -13,6 +13,7 @@
 #include "serialport.h"
 #include "fro.h"
 #include "neuronknowledgebase.h"
+#include "robot_simulator.h"
 #include <math.h>
 
 
@@ -75,7 +76,7 @@ private slots:
     //void link(QList<std::shared_ptr<neuron_AAC_type_1>> net, int form, int to);
     void formGraphVizText(QList<std::shared_ptr<neuron_AAC_type_1>> net);
 
-     QVector<QVector<int>> generate_test_data();
+
 
 
 private:
@@ -97,7 +98,8 @@ private:
 
     NeuronKnowledgeBase *neuronKnowledgeBase;
 
-    //QRandomGenerator
+    Robot_simulator *robot_simulator;
+
     QVector<QVector<int>> input_patterns_list;
 
 

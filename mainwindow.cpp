@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QTimer *timer_action = new QTimer(this);
     connect(timer_action, SIGNAL(timeout()), this, SLOT(timer_action_update()));
-    timer_action->start(20); //2000
+    timer_action->start(2000); //2000
 
     QTimer *timer_save_knowladgebase = new QTimer(this);
     connect(timer_save_knowladgebase, SIGNAL(timeout()), this, SLOT(timer_save_kb_update()));
@@ -160,9 +160,10 @@ MainWindow::MainWindow(QWidget *parent) :
     n03->run();
     n03->sync();
 }*/
-//QVector<QVector<int>> input_patterns_list;
 
-input_patterns_list = generate_test_data();
+
+robot_simulator = new Robot_simulator();
+input_patterns_list = robot_simulator->get_generated_test_data();
 
 
 QVector<int> testgrade = { 2000, 2, 10, 4, 10, 1000, 1000, 600, 600, 300, 300, 160, 120, 80 };
@@ -174,31 +175,14 @@ evaluationSystem = new EvaluationSystem(true,testgrade);
 
 
 QVector<int> testrun =  {1,0,0,0,1,0,0,0,0,0,0,0,0,1};
-/*
-for(int i = 0; i < firstFroSize; i++)
-{
-testrun.append(1);
-}*/
-//building neuron net
-/*
-for(int i = 0; i < 120 * 90; i++)
-{
-   testrun = input_patterns_list[randInt(0,89)];
-  fro_test->run(testrun);
-  if(i % 500 == 0)
-  {
-    formGraphVizText(fro_test->getNeurons());
-  }
-  qDebug() << "debug still running at i =" << i << endl;
-}
 
-
-formGraphVizText(fro_test->getNeurons());*/
 
 
 neuronKnowledgeBase = new NeuronKnowledgeBase(input_patterns_list, true, testgrade, 6, 40);
 
 neuronKnowledgeBase->load_knowladgebase_from_file("../knowladgebase.txt");
+
+robot_simulator->load_to_file("../robot_simulator_model.txt");
 
 
 }
@@ -253,6 +237,11 @@ void MainWindow::timer_save_kb_update()
         neuronKnowledgeBase->save_KnowledgeBase_to_file( "../knowladgebase.txt" );
     }
 
+    //save robot model
+    robot_simulator->save_to_file("../robot_simulator_model.txt");
+
+
+
 }
 
 
@@ -267,11 +256,11 @@ void MainWindow::timer_action_update()
     QVector<int> FRO_vector_run_previous;
     int actionIndexPrevious = 0;
     //qDebug() << "timer action event " << endl;
-    int rand = randInt(0,5);
 
 
 
-    /*
+
+
     if(abs(sensordata.previous_distance - sensordata.current_distance) <=2)
     {
         sensordata.same_distance = 1;
@@ -311,32 +300,37 @@ void MainWindow::timer_action_update()
     FRO_vector_run_current.append((int)sensordata.closer_distance);
     FRO_vector_run_current.append((int)sensordata.same_distance);
     FRO_vector_run_current.append((int)sensordata.longer_distance);
-    */
 
 
-    QVector<int> testrun;
-    testrun = input_patterns_list[randInt(0,89)];
 
 
-    /*
-    FRO_vector_run_current = testrun;
+
+
+
+
 
     neuronKnowledgeBase->setKnowledgeBasePatternCurrent(FRO_vector_run_current); //result pattern
     FRO_vector_run_previous = neuronKnowledgeBase->getKnowledgeBasePatternPrevious(); //previous pattern
     actionIndexPrevious = neuronKnowledgeBase->getLastActionIndex(); //previous action
 
 
+    //here save to model robot
 
+   robot_simulator->save_combination(FRO_vector_run_previous, actionIndexPrevious, FRO_vector_run_current);
 
     //run knowladgebase and save and manage
 
     //and choose action
 
-    actionIndexPrevious = neuronKnowledgeBase->run();
+    //actionIndexPrevious = neuronKnowledgeBase->run();
+
+    //random int 0 -5
+
+    actionIndexPrevious = randInt(0,5);
 
 
     neuronKnowledgeBase->setLastActionIndex(actionIndexPrevious);
-    neuronKnowledgeBase->setKnowledgeBasePatternPrevious(FRO_vector_run_current);*/
+    neuronKnowledgeBase->setKnowledgeBasePatternPrevious(FRO_vector_run_current);
 
 
 
@@ -384,40 +378,7 @@ int MainWindow::randInt(int low, int high)
 //
 //---------------------------------------------------------------------------------------------------
 
-QVector<QVector<int>> MainWindow::generate_test_data()
-{
-    QVector<QVector<int>> testrun;// =  {1,0,1,0,0,0,0,1,0,1};
 
-    QVector<int> vector = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-
-
-
-        for(int j = 0; j < 5; j++)
-        {
-
-
-
-            for(int k = 5; k < 11; k++)
-            {
-
-
-                for(int t = 11; t < 14; t++)
-                {
-                    vector = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-                    vector[j] = 1;
-                    vector[k] = 1;
-                    vector[t] = 1;
-
-                    testrun.append(vector);
-                }
-            }
-        }
-
-
-
-return testrun;
-
-}
 //---------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------
@@ -449,7 +410,7 @@ void MainWindow::prase_sensor_data(uint8_t tact_sensor_data,uint8_t direction_to
     sensordata.direction_180_360_left_9 = 0;
     sensordata.direction_180_360_right_10 = 0;
 
-    sensordata.no_sensor = 0;
+    //sensordata.no_sensor = 0;
 
     if(!direction_to_resource_sign)
     {
