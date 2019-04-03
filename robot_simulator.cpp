@@ -58,7 +58,10 @@ void Robot_simulator::save_combination(QVector<int> pattern_current, int action_
 }
 
 
+QVector<int> get_combination_from_memory(QVector<int> pattern_current, int action_number)
+{
 
+}
 
 //--------------------------------------------------------------------------------
 

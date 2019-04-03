@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QtGlobal>
 #include <QTextCodec>
+#include <math.h>
 
 #define MAX_ACTIONS 6
 
@@ -202,8 +203,12 @@ int NeuronKnowledgeBase::run()
     }
 
 
-
+    double rand_action_boarder = 0.0;
+    double rand_value = 0.0;
     int index_to_offer = 0;
+    int k_finded=0;
+
+    double grade_debug = 0.0;
 
     for(int k = 0; k < 90; k++) //k
     {
@@ -214,30 +219,35 @@ int NeuronKnowledgeBase::run()
             Patterns.at(index_to_offer)->run(pattern_input_to_knowladgebase_offer);
             Patterns.at(index_to_offer)->sync();
 
-            out_temp = Patterns.at(index_to_offer)->getOUT();
+            if(index_to_offer!= 0) {
+                out_temp = Patterns.at(index_to_offer)->getOUT();
+            }
 
 
             if(out_temp == 1)
             {
+
                 count++;
                 //qCritical() << " out_pattern " + QString::number(out_temp) + " i = " + QString::number(i) << endl;
-                //find answer
-                if(action_answer == -1)
-                {
-                action_answer = index_to_offer % (90 * 6); //???
-                }
 
-                filled_layer +=  1.0 / (6.0 * 90.0); //???
+                //find answer
+
+                   action_answer = j;
+                   k_finded = k;
+                   goto A;
+
             }
 
             Patterns.at(index_to_offer)->reset(); //reset because it is database
-
         }
     }
 
+    A:
 
 
-
+    QVector<int> test;
+    test = sortend_input_pattern.at(k1).first;
+    grade_debug = evaluationSystem->gradePattern( test );
 
 
 
@@ -254,14 +264,28 @@ int NeuronKnowledgeBase::run()
     //rand on not rand
 
 
-    if(filled_layer < 1.01)
-    {
-        action_answer = rand()%6;
-        debug_text = QString::number(filled_layer, 'f', 15) + " time in ms : " + QString::number(msecs);
-    }
+
+        debug_text = QString::number(filled_layer, 'f', 15) + "grade = "+ QString::number(grade_debug,'f', 15) + " time in ms : " + QString::number(msecs);
+
+        save_grade_pattern("../grade.txt",grade_debug);
 
     if(action_answer == -1)
-        return 0;
+    {
+        //rand
+        rand_value = static_cast <double> (rand()) / static_cast <float> (RAND_MAX);
+        rand_value = rand_value * 100.0;
+
+        rand_action_boarder = probability_of_choosing_a_random_action(90, k_finded);
+
+        if(rand_value >= rand_action_boarder)
+        {
+            action_answer  = qrand() % ((5 + 1) - 0) + 0;
+        }
+
+
+
+    }
+
 
     return action_answer;
 
@@ -271,9 +295,13 @@ int NeuronKnowledgeBase::run()
 //-------------------------------------------------------------------------------------------------
 double NeuronKnowledgeBase::probability_of_choosing_a_random_action(int max_length, int current_index)
 {
+    double test_1, test_2, test_3;
+    test_1 = atan(((double)current_index - (double)(max_length)/2) / M_PI);
+    test_2 = test_1 * 25;
+    test_3 = test_2 + 50.0;
 
-
-    return 0.0;
+    return  test_3;
+    //return  100.0 - test_3;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -302,6 +330,24 @@ void NeuronKnowledgeBase::save_KnowledgeBase_to_file(QString path)
 
 
 }
+
+void NeuronKnowledgeBase::save_grade_pattern(QString path, double grade_debug)
+{
+    QString Hfilename = path;
+
+    QFile fileH( Hfilename );
+
+    if(fileH.open(QIODevice::Append ))
+    {
+        QTextStream stream( &fileH );
+
+        stream << QString::number(grade_debug) + "\n";
+
+        fileH.close();
+
+    }
+}
+
 
 void NeuronKnowledgeBase::load_knowladgebase_from_file(QString path)
 {

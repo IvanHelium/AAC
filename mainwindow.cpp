@@ -184,6 +184,13 @@ neuronKnowledgeBase->load_knowladgebase_from_file("../knowladgebase.txt");
 
 robot_simulator->load_to_file("../robot_simulator_model.txt");
 
+double test_result;
+
+for(int i = 0; i < 80; i++)
+{
+    test_result = neuronKnowledgeBase->probability_of_choosing_a_random_action(90, i);
+
+}
 
 }
 
@@ -304,6 +311,7 @@ void MainWindow::timer_action_update()
 
 
 
+    //robot simulator get
 
 
 
@@ -316,17 +324,17 @@ void MainWindow::timer_action_update()
 
     //here save to model robot
 
-   robot_simulator->save_combination(FRO_vector_run_previous, actionIndexPrevious, FRO_vector_run_current);
+   //robot_simulator->save_combination(FRO_vector_run_previous, actionIndexPrevious, FRO_vector_run_current);
 
     //run knowladgebase and save and manage
 
     //and choose action
 
-    //actionIndexPrevious = neuronKnowledgeBase->run();
+    actionIndexPrevious = neuronKnowledgeBase->run();
 
     //random int 0 -5
 
-    actionIndexPrevious = randInt(0,5);
+    //actionIndexPrevious = randInt(0,5);
 
 
     neuronKnowledgeBase->setLastActionIndex(actionIndexPrevious);

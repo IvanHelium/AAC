@@ -55,6 +55,8 @@ public:
 
     void load_knowladgebase_from_file(QString path);
 
+    void save_grade_pattern(QString path , double grade_debug);
+
     double probability_of_choosing_a_random_action(int max_length, int current_index); //function has a certain form
 
 

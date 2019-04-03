@@ -19,6 +19,8 @@ public:
 
     QVector<QVector<int>> get_generated_test_data();
 
+    QVector<int> get_combination_from_memory(QVector<int> pattern_current, int action_number);
+
     void save_to_file(QString path);
     void load_to_file(QString path);
 
